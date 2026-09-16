@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>یه لحظه با خودت - همراه آرامش تو</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #a8edd9 0%, #fed6e3 100%);
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --text-color: #2d3748;
+            --accent-pink: #ff758c;
+            --accent-purple: #9f7aea;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --radius: 24px;
+        }
+
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.88);
+            --text-color: #f1f5f9;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background 0.3s, color 0.3s, transform 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #fx-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
+            padding-bottom: 40px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 10px 16px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .season-selector {
+            display: flex;
+            gap: 4px;
+            background: rgba(0,0,0,0.05);
+            padding: 3px;
+            border-radius: 20px;
+        }
+
+        .season-btn {
+            border: none;
+            background: transparent;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .season-btn.active {
+            background: white;
+            color: #111;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .dark-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding: 4px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 10px 12px;
+            border-radius: 16px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            flex: 1 1 calc(33.333% - 8px);
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+        }
+
+        .walk-nav-btn {
+            background: linear-gradient(135deg, #ff758c, #9f7aea);
+            color: #ffffff;
+        }
+
+        header {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: var(--radius);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ff6b6b;
+            margin-bottom: 2px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .patrick-widget {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .patrick-avatar-wrapper {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .patrick-bubble {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 12px 14px;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .like-btn-inline {
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .like-btn-inline.liked {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feelings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .feel-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 14px 10px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+        }
+
+        .feel-btn:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 22px;
+            border-radius: var(--radius);
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            position: relative;
+            animation: popIn 0.25s ease-out;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin: 15px 0 20px 0;
+            color: var(--text-color);
+            text-align: justify;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .close-modal-btn {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 9px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .modal-like-btn {
+            background: rgba(0,0,0,0.05);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            max-height: 60vh;
+            border-radius: 16px;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .sound-items { display: flex; justify-content: space-around; margin-top: 12px; }
+        .sound-btn { background: rgba(0,0,0,0.05); border: 2px solid transparent; padding: 10px 14px; border-radius: 14px; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
+        .sound-btn.active { border-color: var(--accent-pink); background: white; }
+        .volume-slider { width: 100%; margin-top: 15px; accent-color: var(--accent-pink); }
+
+        .breath-circle-container { width: 130px; height: 130px; margin: 15px auto; display: flex; justify-content: center; align-items: center; }
+        .breath-circle { width: 90px; height: 90px; background: linear-gradient(135deg, #ff758c, #ff7b54); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-weight: 700; font-size: 0.8rem; box-shadow: 0 0 20px rgba(255,117,140,0.4); transition: transform 1s linear; }
+        .breath-circle.expand { transform: scale(1.35); }
+        .breath-circle.hold { transform: scale(1.35); }
+        .breath-circle.shrink { transform: scale(1); }
+        .breath-timer { font-size: 1.2rem; font-weight: 900; margin-top: 2px; }
+
+        .garden-display { height: 110px; background: linear-gradient(to bottom, transparent 60%, #8d6e63 60%); border-radius: 16px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px; margin: 12px 0; }
+        .plant-svg { width: 70px; height: 70px; }
+        .water-btn { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; border: none; padding: 8px 18px; border-radius: 50px; font-weight: 700; cursor: pointer; }
+
+        .color-nav { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; }
+        .color-tab { background: rgba(0,0,0,0.05); border: none; padding: 5px 10px; border-radius: 10px; font-size: 0.78rem; cursor: pointer; white-space: nowrap; font-weight: 600; }
+        .color-tab.active { background: var(--accent-purple); color: white; }
+        .svg-canvas-container { width: 100%; height: 210px; background: white; border-radius: 16px; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .palette { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .color-dot.selected { transform: scale(1.2); border-color: #333; }
+
+        .mood-options-new { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .mood-btn-item { background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); padding: 10px 14px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; font-size: 0.9rem; }
+        .mood-btn-item:hover { background: white; border-color: var(--accent-pink); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 15px; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 16px; }
+        .calendar-day { background: white; border-radius: 10px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .calendar-day .day-num { opacity: 0.6; font-size: 0.65rem; }
+        .calendar-day .day-emoji { font-size: 1.1rem; line-height: 1; }
+
+        .diary-input { width: 100%; height: 80px; border-radius: 14px; border: 1px solid #ccc; padding: 10px; font-size: 0.88rem; outline: none; margin-top: 10px; resize: none; }
+        .diary-list { max-height: 180px; overflow-y: auto; text-align: right; margin-top: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .diary-item { background: white; padding: 10px 12px; border-radius: 12px; font-size: 0.85rem; box-shadow: 0 2px 5px rgba(0,0,0,0.04); position: relative; }
+        .diary-date { font-size: 0.7rem; color: #888; margin-bottom: 4px; display: block; }
+        .delete-btn { background: none; border: none; color: #ff5252; cursor: pointer; font-size: 0.9rem; position: absolute; left: 8px; top: 8px; }
+
+        .promise-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; text-align: right; }
+        .promise-item { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
+        .promise-item input { width: 18px; height: 18px; accent-color: var(--accent-pink); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <canvas id="fx-canvas"></canvas>
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="season-selector">
+                <button class="season-btn" onclick="setSeason('winter')">❄️ زمستون</button>
+                <button class="season-btn" onclick="setSeason('autumn')">🍁 پاییز</button>
+                <button class="season-btn active" onclick="setSeason('none')">🚫 هیچکدام</button>
+            </div>
+            <button class="dark-toggle-btn" onclick="toggleDarkMode()">🌙</button>
+        </div>
+
+        <div class="nav-menu">
+            <button class="nav-btn walk-nav-btn" onclick="openToolModal('walk')">🚶‍♂️ پیاده‌روی با امیررضا</button>
+            <button class="nav-btn" onclick="openToolModal('pizza')">🍕 پیتزاساز</button>
+            <button class="nav-btn" onclick="openToolModal('breath')">🌬️ تمرین تنفس</button>
+            <button class="nav-btn" onclick="openToolModal('mood')">📅 تقویم حس روزانه</button>
+            <button class="nav-btn" onclick="openToolModal('diary')">📖 دفترچه خاطرات</button>
+            <button class="nav-btn" onclick="openToolModal('promise')">🤝 قول‌های امروز</button>
+            <button class="nav-btn" onclick="openToolModal('sounds')">🎵 صداهای طبیعت</button>
+            <button class="nav-btn" onclick="openToolModal('garden')">🌱 باغچه‌ی من</button>
+            <button class="nav-btn" onclick="openToolModal('color')">🎨 رنگ‌آمیزی</button>
+            <button class="nav-btn" onclick="openToolModal('likes')">❤️ پیام‌های ذخیره</button>
+        </div>
+
+        <header>
+            <h1>یه لحظه با خودت 🌱</h1>
+            <p>میز گفتگو با پاتریک و پیام‌های روحیه بخش</p>
+        </header>
+
+        <div class="patrick-widget" onclick="patrickTalk()">
+            <div class="patrick-avatar-wrapper">
+                <svg viewBox="0 0 100 110" width="100%" height="100%">
+                    <path d="M50 5 L63 35 L95 38 L72 62 L78 95 L50 78 L22 95 L28 62 L5 38 L37 35 Z" fill="#ff7b54" stroke="#e05638" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M25 68 Q 50 63 75 68 L78 95 L50 82 L22 95 Z" fill="#76ff03" stroke="#333" stroke-width="1.5"/>
+                    <path d="M 32 78 Q 36 74 40 78 Q 36 82 32 78" fill="#e040fb"/>
+                    <path d="M 60 80 Q 64 76 68 80 Q 64 84 60 80" fill="#e040fb"/>
+                    <ellipse cx="43" cy="32" rx="5" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                    <ellipse cx="57" cy="32" rx="5" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+                    <circle cx="44" cy="32" r="2.5" fill="#333"/>
+                    <circle cx="56" cy="32" r="2.5" fill="#333"/>
+                    <path d="M 40 45 Q 50 54 60 45" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="35" cy="41" r="3.5" fill="#ff5252" opacity="0.4"/>
+                    <circle cx="65" cy="41" r="3.5" fill="#ff5252" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="patrick-bubble">
+                <button class="like-btn-inline" id="patrick-like-btn" onclick="event.stopPropagation(); toggleLikeCurrentPatrick();">🤍</button>
+                <span id="patrick-text">سلام! من پاتریکم ⭐ بزن روم تا یه جمله باحال بهت بگم!</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">✨ الان چه حسی داری؟ (انتخاب کن تا حرف بزنیم)</div>
+            <div class="feelings-grid">
+                <button class="feel-btn" onclick="showSupport('sad')">☁️ غصه داری؟</button>
+                <button class="feel-btn" onclick="showSupport('unmotivated')">🔥 بی‌انگیزه‌ای؟</button>
+                <button class="feel-btn" onclick="showSupport('angry')">🌊 عصبانی‌ای؟</button>
+                <button class="feel-btn" onclick="showSupport('stressed')">🌬️ استرس داری؟</button>
+                <button class="feel-btn" onclick="showSupport('lonely')">🌙 تنها حس می‌کنی؟</button>
+                <button class="feel-btn" onclick="showSupport('sleepless')">😴 خوابت نمیبره؟</button>
+                <button class="feel-btn" onclick="showSupport('anxious')">🌪️ دلشوره داری؟</button>
+                <button class="feel-btn" onclick="showSupport('doubt')">💚 به خودت شک داری؟</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-body"></div>
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button class="close-modal-btn" onclick="closeModal()">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateCategoryMessages(prefixArray, amirrezaPhrases) {
+            let result = [];
+            for (let p of prefixArray) {
+                for (let a of amirrezaPhrases) {
+                    result.push(`${p} ${a}`);
+                    if (result.length >= 100) break;
+                }
+                if (result.length >= 100) break;
+            }
+            while(result.length < 100) {
+                result.push(`${prefixArray[result.length % prefixArray.length]} امیررضا همیشه همراهته و هواتو داره! ✨ (${result.length + 1})`);
+            }
+            return result;
+        }
+
+        const amirrezaBase = [
+            "امیررضا منتظرته با یه چای گرم... بیا بشینیم صحبت کنیم! ☕💚",
+            "دلت پیاده‌روی می‌خواد؟ امیررضا پایته! 🚶‍♂️✨",
+            "دلت می‌خواد یکم حرف بزنیم؟ بیا، پی‌وی منتظرتم!",
+            "بیا بریم دیوونه‌بازی کنیم و بی‌خیال همه‌چی بشیم! 🔥",
+            "مود الانت رو با یه آهنگ برام بفرست و بیا حرف بزنیم! 🎧",
+            "امیررضا همیشه هواتو داره، اصلاً نگران هیچی نباش.",
+            "یادت نره که امیررضا به تواناییات ایمان کامل داره! 💪",
+            "بیا بریم یه هوایی بخوریم، امیررضا همیشه آمادست.",
+            "هر زمان دلت گرفت، امیررضا کنارته تا سبک بشی.",
+            "رفاقت ما محکم‌تر از این حرفاست، امیررضا منتظرته! 💚"
+        ];
+
+        const supportDatabase = {
+            sad: generateCategoryMessages(["اگه الان دلت گرفته و غصه‌داری، اصلاً خودت رو اذیت نکن.", "روزهای ابری می‌گذرن و خورشید دوباره درمیاد.", "گریه کردن یا ناراحت بودن هیچ اشکالی نداره، تو انسانی.", "غم فقط یه مهمون ناخوانده‌ست که زود میره.", "ناراحتیت برام مهمه، قرار نیست همیشه قوی باشی."], amirrezaBase),
+            unmotivated: generateCategoryMessages(["حس هیچ کاری نیست؟ اصلاً فدای سرت!", "قرار نیست هر روز ۱۰۰٪ انرژی داشته باشی، ۵٪ هم کافیه.", "با قدم‌های خیلی خیلی کوچک شروع کن.", "بی‌انگیزگی یعنی بدنت نیاز به استراحت و تنوع داره."], amirrezaBase),
+            angry: generateCategoryMessages(["نفس عمیق بکش... عصبانیت مثل موج دریاست و رد میشه.", "خشم انرژی زیادی ازت می‌گیره، آروم باش.", "یه لیوان آب سرد بخور و چند لحظه چشمات رو ببند."], amirrezaBase),
+            stressed: generateCategoryMessages(["دستت رو بزار رو قلبت، تو از تمام مشکلاتت بزرگ‌تری.", "استرس مال آینده‌ست، تو الان در زمان حال هستی.", "دم و بازدم عمیق بکش و شونه‌هات رو شل کن."], amirrezaBase),
+            lonely: generateCategoryMessages(["فکر کردی تنهایی؟ اصلاً و ابداً اینطور نیست!", "تنهایی گاهی فرستاده میشه تا خودت رو بهتر بشناسی.", "ارزش تو به حضور آدم‌های زیاد دور و برت نیست."], amirrezaBase),
+            sleepless: generateCategoryMessages(["چشماتو ببند و فکر و خیال رو کاملاً تعطیل کن.", "امشب فقط به چیزهای قشنگ و آرامش‌بخش فکر کن.", "مغزت نیاز به بازسازی داره، همه‌چی رو بگذار برای فردا."], amirrezaBase),
+            anxious: generateCategoryMessages(["این دلشوره فقط یه پیام اشتباه از طرف مغزته، آروم باش.", "هیچ خطری تو رو تهدید نمی‌کنه، همه‌چی ردیفه.", "دستات رو بشور و یه نفس عمیق از بینی بکش."], amirrezaBase),
+            doubt: generateCategoryMessages(["تو فوق‌العاده‌ای! خودت رو با بقیه مقایسه نکن.", "توانایی‌های تو منحصر به فرده و مسیرت جداست.", "به پروسه رشدت اعتماد داشته باش، داری عالی پیش می‌ری."], amirrezaBase)
+        };
+
+        const patrickQuotes = Array.from({length: 100}, (_, i) => {
+            const list = [
+                "دانش جایگزین دوستی نمیشه... من دوستی با تو رو ترجیح میدم! ⭐",
+                "گاهی وقت‌ها باید درهای ذهنت رو ببندی و فقط خوش بگذرونی!",
+                "فکر کردی من هیچی نمی‌فهمم؟ خب درست فکر کردی! ولی دوستت که دارم! 😂",
+                "امیررضا بهم گفت هواتو داشته باشم، منم الان اینجام!",
+                "زندگی مثل یه همبرگر خرچنگی گرم و خوشمزه‌ست!",
+                "وقتی نمی‌دونی چکار کنی، کلاً هیچ‌کاری نکن! کارسازتره!",
+                "سلام! من پاتریکم، متخصص رسمیش در فکر نکردن!",
+                "شلوار جدیدم رو دیدی؟ خوشگل شده؟ 💚🌸"
+            ];
+            return `${list[i % list.length]}`;
+        });
+
+        let lastIndices = { patrick: -1 };
+        let currentPatrickText = "";
+        let currentSupportText = "";
+        let likedMessages = JSON.parse(localStorage.getItem('likedMessages') || '[]');
+
+        function getRandomUnique(array, key) {
+            let randIdx;
+            do {
+                randIdx = Math.floor(Math.random() * array.length);
+            } while (randIdx === lastIndices[key] && array.length > 1);
+            lastIndices[key] = randIdx;
+            return array[randIdx];
+        }
+
+        function patrickTalk() {
+            currentPatrickText = getRandomUnique(patrickQuotes, 'patrick');
+            document.getElementById('patrick-text').innerText = currentPatrickText;
+            updatePatrickLikeUI();
+        }
+
+        function updatePatrickLikeUI() {
+            const btn = document.getElementById('patrick-like-btn');
+            const isLiked = likedMessages.includes(currentPatrickText);
+            btn.innerText = isLiked ? '❤️' : '🤍';
+            btn.classList.toggle('liked', isLiked);
+        }
+
+        function toggleLikeCurrentPatrick() {
+            if (!currentPatrickText) return;
+            toggleLike(currentPatrickText);
+            updatePatrickLikeUI();
+        }
+
+        function toggleLike(msg) {
+            const idx = likedMessages.indexOf(msg);
+            if (idx > -1) { likedMessages.splice(idx, 1); }
+            else { likedMessages.push(msg); }
+            localStorage.setItem('likedMessages', JSON.stringify(likedMessages));
+        }
+
+        function removeLikedMessage(idx) {
+            likedMessages.splice(idx, 1);
+            localStorage.setItem('likedMessages', JSON.stringify(likedMessages));
+            openToolModal('likes');
+        }
+
+        function showSupport(type) {
+            const msgList = supportDatabase[type];
+            currentSupportText = getRandomUnique(msgList, type);
+            const isLiked = likedMessages.includes(currentSupportText);
+
+            const content = `
+                <div class="modal-text">${currentSupportText}</div>
+                <div style="margin-bottom:10px;">
+                    <button class="modal-like-btn" id="modal-like-btn" onclick="toggleSupportLike()">${isLiked ? '❤️ لایک شده' : '🤍 لایک'}</button>
+                </div>
+            `;
+            openCustomModal(content);
+        }
+
+        function toggleSupportLike() {
+            if (!currentSupportText) return;
+            toggleLike(currentSupportText);
+            const isLiked = likedMessages.includes(currentSupportText);
+            document.getElementById('modal-like-btn').innerText = isLiked ? '❤️ لایک شده' : '🤍 لایک';
+        }
+
+        function openCustomModal(htmlContent) {
+            document.getElementById('modal-body').innerHTML = htmlContent;
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            const video = document.getElementById('walkVideo');
+            if (video) video.pause();
+            document.getElementById('modal-overlay').style.display = 'none';
+            if (isBreathing) stopBreathing();
+        }
+
+        /* === BREATHING WITH COUNTDOWN === */
+        let breathTimer = null, isBreathing = false;
+        function stopBreathing() {
+            isBreathing = false;
+            if (breathTimer) clearInterval(breathTimer);
+            const circle = document.getElementById('breath-circle');
+            const btn = document.getElementById('breath-btn');
+            if (circle) { circle.className = 'breath-circle'; circle.innerHTML = 'شروع'; }
+            if (btn) btn.innerText = 'شروع تمرین تنفس';
+        }
+
+        function toggleBreathing() {
+            if (isBreathing) {
+                stopBreathing();
+            } else {
+                isBreathing = true;
+                const btn = document.getElementById('breath-btn');
+                if (btn) btn.innerText = 'توقف تمرین';
+                startBreathingCycle();
+            }
+        }
+
+        function startBreathingCycle() {
+            let phase = 'in'; 
+            let timeLeft = 4;
+            const circle = document.getElementById('breath-circle');
+
+            function updateUI() {
+                if (!isBreathing || !circle) return;
+                if (phase === 'in') {
+                    circle.className = 'breath-circle expand';
+                    circle.innerHTML = `دم<div class="breath-timer">${timeLeft}</div>`;
+                } else if (phase === 'hold') {
+                    circle.className = 'breath-circle hold';
+                    circle.innerHTML = `نگه‌دار<div class="breath-timer">${timeLeft}</div>`;
+                } else if (phase === 'out') {
+                    circle.className = 'breath-circle shrink';
+                    circle.innerHTML = `بازدم<div class="breath-timer">${timeLeft}</div>`;
+                }
+            }
+
+            updateUI();
+            breathTimer = setInterval(() => {
+                if (!isBreathing) return;
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    if (phase === 'in') { phase = 'hold'; timeLeft = 7; }
+                    else if (phase === 'hold') { phase = 'out'; timeLeft = 8; }
+                    else if (phase === 'out') { phase = 'in'; timeLeft = 4; }
+                }
+                updateUI();
+            }, 1000);
+        }
+
+        /* === MOOD CALENDAR & TRACKING === */
+        const moodList = [
+            { label: 'عالیم', emoji: '😆' },
+            { label: 'خوبم', emoji: '😄' },
+            { label: 'بد نیستم', emoji: '☺️' },
+            { label: 'حالم بده', emoji: '😔' },
+            { label: 'افتضاحم', emoji: '😩' }
+        ];
+
+        let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '{}');
+
+        function renderCalendar() {
+            const cal = document.getElementById('calendar-grid');
+            if (!cal) return;
+            cal.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const savedEmoji = moodHistory[i] || '';
+                const dayBox = document.createElement('div');
+                dayBox.className = 'calendar-day';
+                dayBox.innerHTML = `<span class="day-num">${i}</span><span class="day-emoji">${savedEmoji}</span>`;
+                cal.appendChild(dayBox);
+            }
+        }
+
+        function recordMoodForDay(emoji) {
+            const todayIndex = (new Date().getDate() % 30) + 1;
+            moodHistory[todayIndex] = emoji;
+            localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+            document.getElementById('mood-status').innerText = `حس امروزت ثبت شد ✨`;
+            renderCalendar();
+        }
+
+        /* === DIARY SYSTEM === */
+        let diaryEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+
+        function saveDiary() {
+            const text = document.getElementById('diary-text').value.trim();
+            if (!text) return;
+            const newEntry = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('fa-IR'),
+                text: text
+            };
+            diaryEntries.unshift(newEntry);
+            localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
+            openToolModal('diary');
+        }
+
+        function deleteDiary(id) {
+            diaryEntries = diaryEntries.filter(e => e.id !== id);
+            localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
+            openToolModal('diary');
+        }
+
+        /* === PROMISE CHECKLIST WITH DAILY RESET === */
+        let promiseState = JSON.parse(localStorage.getItem('promiseState') || '{}');
+        const todayStr = new Date().toDateString();
+
+        if (promiseState.lastDate !== todayStr) {
+            promiseState = { lastDate: todayStr, p1: false, p2: false, p3: false };
+            localStorage.setItem('promiseState', JSON.stringify(promiseState));
+        }
+
+        function togglePromise(key) {
+            promiseState[key] = !promiseState[key];
+            localStorage.setItem('promiseState', JSON.stringify(promiseState));
+        }
+
+        /* === MODAL TOOLS ROUTER === */
+        function openToolModal(tool) {
+            if (tool === 'walk') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🚶‍♂️ پیاده‌روی با امیررضا 🌙</div>
+                    <div class="video-wrapper" style="margin-top: 12px;">
+                        <video id="walkVideo" controls playsinline muted autoplay>
+                            <source src="walk.mp4" type="video/mp4">
+                            مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+                        </video>
+                    </div>
+                `);
+            } else if (tool === 'pizza') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🍕 پیتزاساز آرامش‌بخش</div>
+                    <div style="width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; margin-top: 10px;">
+                        <iframe src="pizza.html" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                `);
+            } else if (tool === 'breath') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🌬️ تمرین تنفس ۴-۷-۸</div>
+                    <div class="breath-circle-container">
+                        <div class="breath-circle" id="breath-circle">شروع</div>
+                    </div>
+                    <button class="water-btn" onclick="toggleBreathing()" id="breath-btn">شروع تمرین تنفس</button>
+                `);
+            } else if (tool === 'mood') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">📅 ثبت و تقویم حس روزانه</div>
+                    <div class="mood-options-new">
+                        ${moodList.map(m => `
+                            <div class="mood-btn-item" onclick="recordMoodForDay('${m.emoji}')">
+                                <span>${m.label}</span>
+                                <span>${m.emoji}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p id="mood-status" style="font-size:0.85rem; margin-top:10px; text-align:center; color:var(--accent-pink); font-weight:700;"></p>
+                    <div class="section-title" style="justify-content: center; margin-top: 15px;">نمای ماه گذشته</div>
+                    <div class="calendar-grid" id="calendar-grid"></div>
+                `);
+                renderCalendar();
+            } else if (tool === 'diary') {
+                const entriesHTML = diaryEntries.length ? diaryEntries.map(e => `
+                    <div class="diary-item">
+                        <span class="diary-date">${e.date}</span>
+                        <div>${e.text}</div>
+                        <button class="delete-btn" onclick="deleteDiary(${e.id})">🗑️</button>
+                    </div>
+                `).join('') : '<p style="text-align:center; opacity:0.6; font-size:0.85rem;">هنوز هیچ خاطره قشنگی ثبت نکردی...</p>';
+
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">📖 دفترچه خاطرات خوب</div>
+                    <textarea class="diary-input" id="diary-text" placeholder="امروز چه اتفاق خوبی برات افتاد؟ بنویس تا یادگاری بمونه..."></textarea>
+                    <button class="water-btn" style="margin-top:8px; width:100%;" onclick="saveDiary()">ثبت خاطره ✨</button>
+                    <div class="diary-list">${entriesHTML}</div>
+                `);
+            } else if (tool === 'promise') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🤝 قول‌های امروز من</div>
+                    <p style="font-size:0.8rem; opacity:0.8;">هر روز به خودت قول بده و تیکشون رو بزن! (روزانه ریست میشه)</p>
+                    <div class="promise-list">
+                        <label class="promise-item">
+                            <input type="checkbox" ${promiseState.p1 ? 'checked' : ''} onchange="togglePromise('p1')">
+                            امروز میوه خوردم 🍎
+                        </label>
+                        <label class="promise-item">
+                            <input type="checkbox" ${promiseState.p2 ? 'checked' : ''} onchange="togglePromise('p2')">
+                            امروز ۵ لیوان آب خوردم 💧
+                        </label>
+                        <label class="promise-item">
+                            <input type="checkbox" ${promiseState.p3 ? 'checked' : ''} onchange="togglePromise('p3')">
+                            امروز مراقب خودم بودم 💚
+                        </label>
+                    </div>
+                `);
+            } else if (tool === 'likes') {
+                let likesHTML = likedMessages.length ? likedMessages.map((m, idx) => `
+                    <li style="margin-bottom:10px; text-align:justify; display:flex; justify-content:space-between; align-items:center; background:white; padding:8px 12px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
+                        <span style="flex-grow:1; margin-left:8px;">💚 ${m}</span>
+                        <button style="background:none; border:none; cursor:pointer; font-size:1rem;" onclick="removeLikedMessage(${idx})">🗑️</button>
+                    </li>
+                `).join('') : '<p style="text-align:center; opacity:0.6;">هیچ پیامی لایک نشده است.</p>';
+
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">❤️ پیام‌های ذخیره‌شده</div>
+                    <ul style="max-height:280px; overflow-y:auto; padding:5px; font-size:0.85rem; list-style:none;">${likesHTML}</ul>
+                `);
+            } else if (tool === 'sounds') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🎵 صدای آرامش‌بخش طبیعت</div>
+                    <div class="sound-items">
+                        <button class="sound-btn ${activeNodes['rain']?'active':''}" id="btn-rain" onclick="toggleSound('rain')">🌧️ باران</button>
+                        <button class="sound-btn ${activeNodes['ocean']?'active':''}" id="btn-ocean" onclick="toggleSound('ocean')">🌊 دریا</button>
+                        <button class="sound-btn ${activeNodes['forest']?'active':''}" id="btn-forest" onclick="toggleSound('forest')">🌲 جنگل</button>
+                    </div>
+                    <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5" oninput="setVolume(this.value)">
+                `);
+            } else if (tool === 'garden') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🌱 باغچه‌ی من</div>
+                    <p style="font-size:0.8rem; opacity:0.8; margin-top:4px;">روزی یک‌بار می‌تونی به گیاهت آب بدی!</p>
+                    <div class="garden-display">
+                        <svg class="plant-svg" id="plant-icon" viewBox="0 0 100 100"></svg>
+                    </div>
+                    <button class="water-btn" onclick="waterPlant()">🚿 آب دادن به گیاه (امروز)</button>
+                `);
+                updatePlantUI();
+            } else if (tool === 'color') {
+                openCustomModal(`
+                    <div class="section-title" style="justify-content: center;">🎨 رنگ‌آمیزی آرامش‌بخش</div>
+                    <div class="color-nav">
+                        <button class="color-tab active" onclick="loadColoringTemplate(0)">🔮 ماندالا</button>
+                        <button class="color-tab" onclick="loadColoringTemplate(1)">🦋 پروانه</button>
+                        <button class="color-tab" onclick="loadColoringTemplate(2)">🌿 گل</button>
+                        <button class="color-tab" onclick="loadColoringTemplate(3)">⭐ پاتریک</button>
+                    </div>
+                    <div class="svg-canvas-container" id="svg-container"></div>
+                    <div class="palette" id="palette"></div>
+                `);
+                initPalette();
+                loadColoringTemplate(0);
+            }
+        }
+
+        /* === GARDEN === */
+        let plantStage = parseInt(localStorage.getItem('plantStage') || '1');
+        let lastWaterDate = localStorage.getItem('lastWaterDate') || '';
+
+        function updatePlantUI() {
+            const svg = document.getElementById('plant-icon');
+            if(!svg) return;
+            if (plantStage === 1) {
+                svg.innerHTML = `<circle cx="50" cy="85" r="6" fill="#8d6e63"/><path d="M50 85 Q 50 70 50 65" stroke="#4caf50" stroke-width="4" fill="none"/>`;
+            } else if (plantStage === 2) {
+                svg.innerHTML = `<path d="M50 85 Q 50 60 50 45" stroke="#4caf50" stroke-width="5" fill="none"/><path d="M50 60 Q 35 50 30 55 C 35 65 50 60 50 60" fill="#66bb6a"/>`;
+            } else if (plantStage >= 3) {
+                svg.innerHTML = `<path d="M50 85 Q 50 40 50 30" stroke="#2e7d32" stroke-width="6" fill="none"/><path d="M50 50 Q 25 35 20 45 C 30 60 50 50 50 50" fill="#4caf50"/><path d="M50 40 Q 75 25 80 35 C 70 50 50 40 50 40" fill="#4caf50"/><circle cx="50" cy="25" r="12" fill="#ff4081"/>`;
+            }
+        }
+
+        function waterPlant() {
+            const today = new Date().toDateString();
+            if (lastWaterDate === today) {
+                alert("امروز قبلاً به گیاهت آب دادی! 🌧️ فردا دوباره بیا.");
+                return;
+            }
+            plantStage = Math.min(plantStage + 1, 3);
+            lastWaterDate = today;
+            localStorage.setItem('plantStage', plantStage);
+            localStorage.setItem('lastWaterDate', lastWaterDate);
+            updatePlantUI();
+            alert("امروز به گیاهت آب دادی! 🌱 حسابی شاداب شد.");
+        }
+
+        /* === COLORING === */
+        let selectedColor = '#ff758c';
+        const colors = ['#ff758c', '#ff7b54', '#ffd166', '#06d6a0', '#118ab2', '#9f7aea', '#333333'];
+
+        const templates = [
+            `<svg viewBox="0 0 100 100" width="100%" height="100%"><circle class="colorable" cx="50" cy="50" r="45" fill="#fff" stroke="#333" stroke-width="1.5"/><circle class="colorable" cx="50" cy="50" r="32" fill="#fff" stroke="#333" stroke-width="1.5"/><circle class="colorable" cx="50" cy="50" r="20" fill="#fff" stroke="#333" stroke-width="1.5"/><circle class="colorable" cx="50" cy="50" r="8" fill="#fff" stroke="#333" stroke-width="1.5"/></svg>`,
+            `<svg viewBox="0 0 100 100" width="100%" height="100%"><path class="colorable" d="M 50 30 C 15 5 5 45 45 55 C 5 75 25 95 50 65 C 75 95 95 75 55 55 C 95 45 85 5 50 30" fill="#ffffff" stroke="#333" stroke-width="2"/><circle class="colorable" cx="30" cy="35" r="5" fill="#fff" stroke="#333"/><circle class="colorable" cx="70" cy="35" r="5" fill="#fff" stroke="#333"/></svg>`,
+            `<svg viewBox="0 0 100 100" width="100%" height="100%"><path class="colorable" d="M30 80 Q 50 50 20 30 C 40 20 60 40 50 80" fill="#fff" stroke="#333" stroke-width="2"/><path class="colorable" d="M70 80 Q 50 50 80 30 C 60 20 40 40 50 80" fill="#fff" stroke="#333" stroke-width="2"/><circle class="colorable" cx="50" cy="30" r="10" fill="#fff" stroke="#333" stroke-width="2"/></svg>`,
+            `<svg viewBox="0 0 100 100" width="100%" height="100%"><path class="colorable" d="M50 5 L63 35 L95 38 L70 60 L78 92 L50 75 L22 92 L30 60 L5 38 L37 35 Z" fill="#ffffff" stroke="#333" stroke-width="2"/></svg>`
+        ];
+
+        function initPalette() {
+            const paletteDiv = document.getElementById('palette');
+            if(!paletteDiv) return;
+            paletteDiv.innerHTML = '';
+            colors.forEach((c, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `color-dot ${idx === 0 ? 'selected' : ''}`;
+                dot.style.background = c;
+                dot.onclick = () => {
+                    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+                    dot.classList.add('selected');
+                    selectedColor = c;
+                };
+                paletteDiv.appendChild(dot);
+            });
+        }
+
+        function loadColoringTemplate(idx) {
+            document.querySelectorAll('.color-tab').forEach((t, i) => { t.classList.toggle('active', i === idx); });
+            const container = document.getElementById('svg-container');
+            if(!container) return;
+            container.innerHTML = templates[idx];
+            container.querySelectorAll('.colorable').forEach(el => {
+                el.onclick = function() { this.setAttribute('fill', selectedColor); };
+            });
+        }
+
+        /* === AUDIO === */
+        let audioCtx, masterGain, activeNodes = {};
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain();
+                masterGain.connect(audioCtx.destination);
+            }
+        }
+        function setVolume(val) { if (masterGain) masterGain.gain.value = val; }
+        function toggleSound(type) {
+            initAudio();
+            const btn = document.getElementById(`btn-${type}`);
+            if (activeNodes[type]) {
+                activeNodes[type].stop();
+                delete activeNodes[type];
+                if(btn) btn.classList.remove('active');
+            } else {
+                const node = createNaturalSound(type);
+                node.start();
+                activeNodes[type] = node;
+                if(btn) btn.classList.add('active');
+            }
+        }
+        function createNaturalSound(type) {
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer; noise.loop = true;
+            const filter = audioCtx.createBiquadFilter();
+            if (type === 'rain') { filter.type = 'lowpass'; filter.frequency.value = 1000; }
+            else if (type === 'ocean') { filter.type = 'bandpass'; filter.frequency.value = 400; }
+            else if (type === 'forest') { filter.type = 'bandpass'; filter.frequency.value = 2500; }
+            noise.connect(filter); filter.connect(masterGain);
+            return noise;
+        }
+
+        /* === SEASONAL CANVAS === */
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [], currentSeason = 'none', animFrame;
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function setSeason(season) {
+            currentSeason = season;
+            document.querySelectorAll('.season-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            particles = [];
+            if (animFrame) cancelAnimationFrame(animFrame);
+            if (season === 'winter') { for(let i=0; i<60; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*3+1, speedY: Math.random()*1+0.5, speedX: Math.sin(Math.random())*0.5}); animateFX(); }
+            else if (season === 'autumn') { for(let i=0; i<35; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*10+8, color: ['#e76f51', '#f4a261', '#e9c46a'][Math.floor(Math.random()*3)], speedY: Math.random()*1.5+0.8, speedX: Math.sin(Math.random())*1, rot: Math.random()*360, rotSpeed: Math.random()*2-1}); animateFX(); }
+            else { ctx.clearRect(0,0,canvas.width,canvas.height); }
+        }
+
+        function animateFX() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (currentSeason === 'winter') {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; ctx.beginPath();
+                particles.forEach(p => { ctx.moveTo(p.x, p.y); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); p.y += p.speedY; p.x += p.speedX; if (p.y > canvas.height) p.y = -10; });
+                ctx.fill();
+            } else if (currentSeason === 'autumn') {
+                particles.forEach(p => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180); ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size/2, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                    p.y += p.speedY; p.x += p.speedX; p.rot += p.rotSpeed; if (p.y > canvas.height) p.y = -10;
+                });
+            }
+            if (currentSeason !== 'none') animFrame = requestAnimationFrame(animateFX);
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    </script>
+</body>
+</html>

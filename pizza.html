@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیتزاساز آرامش‌بخش | Cozy Pizza Builder</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --bg-color: #fcf8f2;
+            --card-bg: #ffffff;
+            --text-color: #2d2422;
+            --text-muted: #8c7a76;
+            --primary: #e05638;
+            --primary-hover: #c84326;
+            --accent: #f59e0b;
+            --border-color: #f0e6df;
+            --pizza-bg: #f5ece5;
+            --shadow: 0 10px 25px -5px rgba(224, 86, 56, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --radius: 20px;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1615;
+            --card-bg: #26201e;
+            --text-color: #f3ece7;
+            --text-muted: #a3928e;
+            --primary: #ff6b4a;
+            --primary-hover: #ff856b;
+            --accent: #fbbf24;
+            --border-color: #382f2c;
+            --pizza-bg: #1f1a18;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 720px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        /* Screen Views */
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Screen */
+        .home-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            gap: 25px;
+        }
+
+        .home-hero-pizza {
+            width: 220px;
+            height: 220px;
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+
+        .quote-box {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            background: var(--bg-color);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .home-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 24px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(224, 86, 56, 0.25);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Builder Layout */
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                overflow-y: auto;
+            }
+        }
+
+        .preview-pane {
+            background-color: var(--pizza-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .pizza-canvas-wrapper {
+            width: 100%;
+            max-width: 360px;
+            aspect-ratio: 1;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .pizza-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 12px 20px rgba(0,0,0,0.12));
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .controls-pane {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        /* Step Indicator */
+        .steps-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .steps-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+
+        .step-item {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            z-index: 1;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .step-item.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-item.completed {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        /* Option Selector Cards */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .option-card {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background: rgba(224, 86, 56, 0.06);
+        }
+
+        .option-icon {
+            font-size: 1.5rem;
+        }
+
+        .option-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-title {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .option-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Step Title & Footer */
+        .step-header {
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .step-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .step-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 12px;
+        }
+
+        /* Oven Screen */
+        .oven-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #110d0c;
+            color: #f3ece7;
+            position: relative;
+        }
+
+        .oven-window {
+            width: 320px;
+            height: 320px;
+            background: #1c1514;
+            border: 12px solid #332725;
+            border-radius: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 30px rgba(245, 158, 11, 0.1);
+            transition: box-shadow 0.5s;
+        }
+
+        .oven-window.baking {
+            box-shadow: inset 0 0 50px rgba(245, 158, 11, 0.5), 0 0 40px rgba(224, 86, 56, 0.4);
+        }
+
+        .oven-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(0,0,0,0) 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .oven-window.baking .oven-glow {
+            opacity: 1;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .oven-controls {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .range-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #a3928e;
+        }
+
+        input[type=range] {
+            accent-color: var(--primary);
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        .oven-status-text {
+            color: #fbbf24;
+            font-weight: bold;
+            font-size: 1.05rem;
+            min-height: 1.5em;
+            text-align: center;
+        }
+
+        /* Final Recipe Screen */
+        .final-screen {
+            padding: 30px 20px;
+            align-items: center;
+            overflow-y: auto;
+            gap: 20px;
+        }
+
+        .receipt-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .input-name {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .input-name:focus {
+            border-color: var(--primary);
+        }
+
+        /* Saved Pizzas Modal / List */
+        .saved-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .saved-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .saved-card-title {
+            font-weight: bold;
+        }
+
+        .saved-card-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Placement Hint Toast */
+        .placement-hint {
+            position: absolute;
+            top: 15px;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <header>
+        <div class="logo" onclick="showScreen('home-screen')">
+            <span>🍕</span>
+            <span>پیتزا پز آرامش</span>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="audio-toggle-btn" title="موسیقی پس‌زمینه" onclick="toggleAudio()">🎵</button>
+            <button class="icon-btn" title="تغییر تم" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <!-- 1. HOME SCREEN -->
+    <div id="home-screen" class="screen active home-screen">
+        <svg class="home-hero-pizza" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#e89d50" />
+            <circle cx="50" cy="50" r="38" fill="#e63946" />
+            <circle cx="50" cy="50" r="34" fill="#f1faee" />
+            <circle cx="38" cy="38" r="6" fill="#be123c" />
+            <circle cx="62" cy="42" r="6" fill="#be123c" />
+            <circle cx="48" cy="62" r="6" fill="#be123c" />
+            <circle cx="58" cy="58" r="3" fill="#334155" />
+            <circle cx="36" cy="54" r="3" fill="#334155" />
+        </svg>
+        <div>
+            <h2>طعم آرامش، ساخت پیتزای دلخواه</h2>
+            <p class="quote-box" id="random-quote" style="margin-top: 8px;">امروز یه پیتزای خوب می‌چسبه.</p>
+        </div>
+        <div class="home-actions">
+            <button class="btn btn-primary" onclick="startNewPizza()">✨ بریم پیتزا بسازیم</button>
+            <button class="btn btn-secondary" onclick="makeRandomPizza()">🎲 پیتزای شانسی</button>
+            <button class="btn btn-secondary" onclick="showSavedPizzas()">📂 پیتزاهای من</button>
+        </div>
+    </div>
+
+    <!-- 2. BUILDER SCREEN -->
+    <div id="builder-screen" class="screen">
+        <div class="builder-layout">
+            <!-- Left Preview Canvas -->
+            <div class="preview-pane">
+                <div id="placement-hint" class="placement-hint" style="display: none;">برای چیدن روی پیتزا کلیک کنید</div>
+                <div class="pizza-canvas-wrapper" id="pizza-canvas-container" onclick="handleCanvasClick(event)">
+                    <svg id="pizza-svg" class="pizza-svg" viewBox="0 0 200 200">
+                        <!-- Dynamic SVG Layers Rendered via JS -->
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Right Step Controls -->
+            <div class="controls-pane">
+                <div>
+                    <div class="steps-bar">
+                        <div class="step-item active" id="step-dot-1">۱</div>
+                        <div class="step-item" id="step-dot-2">۲</div>
+                        <div class="step-item" id="step-dot-3">۳</div>
+                        <div class="step-item" id="step-dot-4">۴</div>
+                        <div class="step-item" id="step-dot-5">۵</div>
+                    </div>
+
+                    <div class="step-header">
+                        <div class="step-title" id="step-title">انتخاب خمیر و اندازه</div>
+                        <div class="step-subtitle" id="step-subtitle">شکل، ضخامت و ابعاد پیتزا را مشخص کنید.</div>
+                    </div>
+
+                    <div id="step-content">
+                        <!-- Dynamic Steps Content -->
+                    </div>
+                </div>
+
+                <div class="step-footer">
+                    <button class="btn btn-secondary" id="prev-btn" onclick="prevStep()">قبلی</button>
+                    <button class="btn btn-primary" id="next-btn" onclick="nextStep()">بعدی ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. OVEN SCREEN -->
+    <div id="oven-screen" class="screen oven-container">
+        <div class="step-title" style="margin-bottom: 15px;">مرحله پخت پیتزا</div>
+        <div class="oven-window" id="oven-window">
+            <div class="oven-glow"></div>
+            <div style="width: 200px; height: 200px;">
+                <svg id="oven-pizza-svg" viewBox="0 0 200 200" style="width: 100%; height: 100%;"></svg>
+            </div>
+        </div>
+
+        <div class="oven-status-text" id="oven-status">فر آماده است...</div>
+
+        <div class="oven-controls" id="oven-controls">
+            <div class="range-group">
+                <div class="range-header">
+                    <span>دمای فر</span>
+                    <span id="temp-val">200°C</span>
+                </div>
+                <input type="range" id="temp-range" min="180" max="250" value="200" oninput="document.getElementById('temp-val').innerText = this.value + '°C'">
+            </div>
+            <div class="range-group">
+                <div class="range-header">
+                    <span>زمان پخت</span>
+                    <span id="time-val">10 ثانیه</span>
+                </div>
+                <input type="range" id="time-range" min="5" max="20" value="10" oninput="document.getElementById('time-val').innerText = this.value + ' ثانیه'">
+            </div>
+            <button class="btn btn-primary" onclick="startBaking()" style="margin-top: 10px;">🔥 گذاشتن داخل فر</button>
+        </div>
+    </div>
+
+    <!-- 4. FINAL SCREEN -->
+    <div id="final-screen" class="screen final-screen">
+        <div style="font-size: 3rem;">🎉</div>
+        <h2 class="step-title">پیتزای شما آماده است!</h2>
+        <div style="width: 180px; height: 180px;">
+            <svg id="final-pizza-svg" viewBox="0 0 200 200" style="width: 100%; height: 100%;"></svg>
+        </div>
+
+        <input type="text" id="pizza-name-input" class="input-name" placeholder="یک نام برای پیتزات بنویس (مثلا: پیتزای شبانه)" value="پیتزای مخصوص من">
+
+        <div class="receipt-card" id="recipe-summary">
+            <!-- Rendered by JS -->
+        </div>
+
+        <div style="display: flex; gap: 12px; width: 100%; max-width: 400px;">
+            <button class="btn btn-secondary" style="flex: 1;" onclick="showScreen('home-screen')">صفحه اصلی</button>
+            <button class="btn btn-primary" style="flex: 1;" onclick="saveCurrentPizza()">💾 ذخیره پیتزا</button>
+        </div>
+    </div>
+
+    <!-- 5. SAVED PIZZAS SCREEN -->
+    <div id="saved-screen" class="screen" style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 class="step-title">پیتزاهای ذخیره‌شده</h2>
+            <button class="btn btn-secondary" onclick="showScreen('home-screen')">بازگشت</button>
+        </div>
+        <div class="saved-list" id="saved-list-container">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Application State ---
+    const quotes = [
+        "امروز یه پیتزای خوب می‌چسبه.",
+        "آشپزخونه آماده‌ست...",
+        "بریم یه چیز خوشمزه درست کنیم.",
+        "وقتشه یه پیتزای مخصوص خودت بسازی."
+    ];
+
+    let currentStep = 1;
+    let pizzaState = {
+        dough: 'classic', // classic, thin, thick
+        shape: 'round',   // round, square
+        size: 'medium',   // small, medium, large
+        sauce: 'tomato',  // tomato, white, spicy, none
+        cheese: 'mozzarella', // mozzarella, cheddar, mix
+        cheeseAmount: 'normal', // light, normal, extra
+        toppings: [],     // array of { id, x, y, rotation }
+        selectedToppingCategory: 'pepperoni',
+        bakeFactor: 0     // 0 (raw) to 1 (baked crispy)
+    };
+
+    let audioCtx = null;
+    let isPlayingAudio = false;
+
+    // --- Asset Definitions (SVG Elements) ---
+    const toppingDefinitions = {
+        pepperoni: { name: 'پپرونی', category: 'meats', icon: '🍕' },
+        sausage: { name: 'سوسیس', category: 'meats', icon: '🌭' },
+        chicken: { name: 'مرغ', category: 'meats', icon: '🍗' },
+        mushroom: { name: 'قارچ', category: 'veggies', icon: '🍄' },
+        olive: { name: 'زیتون', category: 'veggies', icon: '🫒' },
+        pepper: { name: 'فلفل دلمه‌ای', category: 'veggies', icon: '🫑' },
+        corn: { name: 'ذرت', category: 'veggies', icon: '🌽' },
+        onion: { name: 'پیاز', category: 'veggies', icon: '🧅' }
+    };
+
+    // --- Initializer ---
+    window.onload = () => {
+        document.getElementById('random-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        renderPizza('pizza-svg');
+    };
+
+    // --- Navigation & Flow ---
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function startNewPizza() {
+        pizzaState = {
+            dough: 'classic',
+            shape: 'round',
+            size: 'medium',
+            sauce: 'tomato',
+            cheese: 'mozzarella',
+            cheeseAmount: 'normal',
+            toppings: [],
+            selectedToppingCategory: 'pepperoni',
+            bakeFactor: 0
+        };
+        currentStep = 1;
+        updateStepUI();
+        showScreen('builder-screen');
+    }
+
+    function updateStepUI() {
+        // Update Step Dots
+        for (let i = 1; i <= 5; i++) {
+            const dot = document.getElementById(`step-dot-${i}`);
+            dot.className = 'step-item';
+            if (i === currentStep) dot.classList.add('active');
+            else if (i < currentStep) dot.classList.add('completed');
+        }
+
+        const titleEl = document.getElementById('step-title');
+        const subtitleEl = document.getElementById('step-subtitle');
+        const contentEl = document.getElementById('step-content');
+        const hintEl = document.getElementById('placement-hint');
+
+        hintEl.style.display = (currentStep === 5) ? 'block' : 'none';
+
+        if (currentStep === 1) {
+            titleEl.innerText = "انتخاب خمیر و اندازه";
+            subtitleEl.innerText = "پایه اصلی پیتزای خودت رو انتخاب کن.";
+            contentEl.innerHTML = `
+                <div style="font-weight:bold; margin-bottom: 8px; font-size:0.85rem;">نوع خمیر:</div>
+                <div class="options-grid">
+                    <div class="option-card ${pizzaState.dough==='classic'?'selected':''}" onclick="setOption('dough','classic')">
+                        <span class="option-icon">🍞</span>
+                        <div class="option-info"><span class="option-title">معمولی</span><span class="option-desc">کلاسیک و متوازن</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.dough==='thin'?'selected':''}" onclick="setOption('dough','thin')">
+                        <span class="option-icon">🫓</span>
+                        <div class="option-info"><span class="option-title">نازک (ایتالیایی)</span><span class="option-desc">ترد و سبك</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.dough==='thick'?'selected':''}" onclick="setOption('dough','thick')">
+                        <span class="option-icon">🥖</span>
+                        <div class="option-info"><span class="option-title">ضخیم (امریکایی)</span><span class="option-desc">پرکننده و حجیم</span></div>
+                    </div>
+                </div>
+                <div style="font-weight:bold; margin: 15px 0 8px 0; font-size:0.85rem;">اندازه پیتزا:</div>
+                <div class="options-grid">
+                    <div class="option-card ${pizzaState.size==='small'?'selected':''}" onclick="setOption('size','small')">
+                        <span class="option-info"><span class="option-title">کوچک</span></span>
+                    </div>
+                    <div class="option-card ${pizzaState.size==='medium'?'selected':''}" onclick="setOption('size','medium')">
+                        <span class="option-info"><span class="option-title">متوسط</span></span>
+                    </div>
+                    <div class="option-card ${pizzaState.size==='large'?'selected':''}" onclick="setOption('size','large')">
+                        <span class="option-info"><span class="option-title">بزرگ</span></span>
+                    </div>
+                </div>
+            `;
+        } else if (currentStep === 2) {
+            titleEl.innerText = "انتخاب سس";
+            subtitleEl.innerText = "طعم پایه روی خمیر را تعیین کنید.";
+            contentEl.innerHTML = `
+                <div class="options-grid">
+                    <div class="option-card ${pizzaState.sauce==='tomato'?'selected':''}" onclick="setOption('sauce','tomato')">
+                        <span class="option-icon">🍅</span>
+                        <div class="option-info"><span class="option-title">سس گوجه</span><span class="option-desc">کلاسیک</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.sauce==='white'?'selected':''}" onclick="setOption('sauce','white')">
+                        <span class="option-icon">🥛</span>
+                        <div class="option-info"><span class="option-title">سس سفید (آلفردو)</span><span class="option-desc">ملایم و خامی</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.sauce==='spicy'?'selected':''}" onclick="setOption('sauce','spicy')">
+                        <span class="option-icon">🌶️</span>
+                        <div class="option-info"><span class="option-title">سس تند</span><span class="option-desc">پر حرارت</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.sauce==='none'?'selected':''}" onclick="setOption('sauce','none')">
+                        <span class="option-icon">🚫</span>
+                        <div class="option-info"><span class="option-title">بدون سس</span></div>
+                    </div>
+                </div>
+            `;
+        } else if (currentStep === 3) {
+            titleEl.innerText = "انتخاب پنیر";
+            subtitleEl.innerText = "نوع و مقدار پنیر مورد علاقه‌تان را مشخص کنید.";
+            contentEl.innerHTML = `
+                <div style="font-weight:bold; margin-bottom: 8px; font-size:0.85rem;">نوع پنیر:</div>
+                <div class="options-grid">
+                    <div class="option-card ${pizzaState.cheese==='mozzarella'?'selected':''}" onclick="setOption('cheese','mozzarella')">
+                        <span class="option-icon">🧀</span>
+                        <div class="option-info"><span class="option-title">موزارلا</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.cheese==='cheddar'?'selected':''}" onclick="setOption('cheese','cheddar')">
+                        <span class="option-icon">🟡</span>
+                        <div class="option-info"><span class="option-title">چدار</span></div>
+                    </div>
+                    <div class="option-card ${pizzaState.cheese==='mix'?'selected':''}" onclick="setOption('cheese','mix')">
+                        <span class="option-icon">🟧</span>
+                        <div class="option-info"><span class="option-title">ترکیبی</span></div>
+                    </div>
+                </div>
+                <div style="font-weight:bold; margin: 15px 0 8px 0; font-size:0.85rem;">مقدار پنیر:</div>
+                <div class="options-grid">
+                    <div class="option-card ${pizzaState.cheeseAmount==='light'?'selected':''}" onclick="setOption('cheeseAmount','light')">
+                        <span class="option-info"><span class="option-title">کم</span></span>
+                    </div>
+                    <div class="option-card ${pizzaState.cheeseAmount==='normal'?'selected':''}" onclick="setOption('cheeseAmount','normal')">
+                        <span class="option-info"><span class="option-title">معمولی</span></span>
+                    </div>
+                    <div class="option-card ${pizzaState.cheeseAmount==='extra'?'selected':''}" onclick="setOption('cheeseAmount','extra')">
+                        <span class="option-info"><span class="option-title">زیاد</span></span>
+                    </div>
+                </div>
+            `;
+        } else if (currentStep === 4) {
+            titleEl.innerText = "انتخاب مخلفات";
+            subtitleEl.innerText = "موادی که دوست داری رو انتخاب کن تا روی پیتزا آماده بشن.";
+            let itemsHtml = '';
+            for (let key in toppingDefinitions) {
+                const item = toppingDefinitions[key];
+                const count = pizzaState.toppings.filter(t => t.id === key).length;
+                itemsHtml += `
+                    <div class="option-card ${count > 0 ? 'selected' : ''}" onclick="addAutoTopping('${key}')">
+                        <span class="option-icon">${item.icon}</span>
+                        <div class="option-info">
+                            <span class="option-title">${item.name}</span>
+                            <span class="option-desc">${count > 0 ? count + ' عدد روی پیتزا' : 'افزودن'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            contentEl.innerHTML = `<div class="options-grid">${itemsHtml}</div>`;
+        } else if (currentStep === 5) {
+            titleEl.innerText = "چیدن لمسی مخلفات";
+            subtitleEl.innerText = "ماده مورد نظر را انتخاب کرده و روی پیتزا کلیک کنید.";
+            let selectorHtml = '<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:10px;">';
+            for (let key in toppingDefinitions) {
+                const item = toppingDefinitions[key];
+                const active = pizzaState.selectedToppingCategory === key ? 'border-color:var(--primary); background:rgba(224,86,56,0.1);' : '';
+                selectorHtml += `
+                    <button style="padding:8px 12px; border-radius:10px; border:1px solid var(--border-color); cursor:pointer; display:flex; align-items:center; gap:4px; white-space:nowrap; ${active}" onclick="selectToppingTool('${key}')">
+                        <span>${item.icon}</span> <span>${item.name}</span>
+                    </button>
+                `;
+            }
+            selectorHtml += '</div>';
+            selectorHtml += `
+                <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.85rem; color:var(--text-muted);">تعداد کل مخلفات: ${pizzaState.toppings.length}</span>
+                    <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="clearToppings()">پاک کردن همه</button>
+                </div>
+            `;
+            contentEl.innerHTML = selectorHtml;
+        }
+
+        document.getElementById('prev-btn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+        renderPizza('pizza-svg');
+    }
+
+    function setOption(key, val) {
+        pizzaState[key] = val;
+        playPopSound();
+        updateStepUI();
+    }
+
+    function selectToppingTool(key) {
+        pizzaState.selectedToppingCategory = key;
+        updateStepUI();
+    }
+
+    function addAutoTopping(key) {
+        // Adds 3 scattered items
+        for (let i = 0; i < 3; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 55; // Keep inside pizza
+            const x = 100 + Math.cos(angle) * dist;
+            const y = 100 + Math.sin(angle) * dist;
+            pizzaState.toppings.push({ id: key, x, y, rotation: Math.floor(Math.random() * 360) });
+        }
+        playPopSound();
+        updateStepUI();
+    }
+
+    function handleCanvasClick(e) {
+        if (currentStep !== 5) return;
+        const rect = document.getElementById('pizza-canvas-container').getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 200;
+        const y = ((e.clientY - rect.top) / rect.height) * 200;
+
+        // Check if click is inside pizza radius
+        const dist = Math.sqrt((x - 100) ** 2 + (y - 100) ** 2);
+        if (dist < 75) {
+            pizzaState.toppings.push({
+                id: pizzaState.selectedToppingCategory,
+                x, y,
+                rotation: Math.floor(Math.random() * 360)
+            });
+            playPopSound();
+            renderPizza('pizza-svg');
+            updateStepUI();
+        }
+    }
+
+    function clearToppings() {
+        pizzaState.toppings = [];
+        playPopSound();
+        renderPizza('pizza-svg');
+        updateStepUI();
+    }
+
+    function prevStep() {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepUI();
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < 5) {
+            currentStep++;
+            updateStepUI();
+        } else {
+            // Go to Oven Screen
+            renderPizza('oven-pizza-svg');
+            showScreen('oven-screen');
+        }
+    }
+
+    // --- Dynamic SVG Render Engine ---
+    function renderPizza(svgId) {
+        const svg = document.getElementById(svgId);
+        if (!svg) return;
+
+        let scale = 1;
+        if (pizzaState.size === 'small') scale = 0.85;
+        if (pizzaState.size === 'large') scale = 1.1;
+
+        // Bake color adjustments
+        const b = pizzaState.bakeFactor;
+        const crustColor = interpolateColor('#e29d52', '#8c4f12', b);
+        const cheeseColor = pizzaState.cheese === 'cheddar'
+            ? interpolateColor('#fbbf24', '#d97706', b)
+            : pizzaState.cheese === 'mix'
+                ? interpolateColor('#f59e0b', '#b45309', b)
+                : interpolateColor('#fef3c7', '#f59e0b', b);
+
+        let sauceColor = '#dc2626';
+        if (pizzaState.sauce === 'white') sauceColor = '#fef08a';
+        if (pizzaState.sauce === 'spicy') sauceColor = '#ea580c';
+
+        let html = `<g transform="translate(100,100) scale(${scale}) translate(-100,-100)">`;
+
+        // 1. Crust Layer
+        const crustRadius = pizzaState.dough === 'thick' ? 82 : pizzaState.dough === 'thin' ? 76 : 79;
+        html += `<circle cx="100" cy="100" r="${crustRadius}" fill="${crustColor}" />`;
+
+        // 2. Sauce Layer
+        if (pizzaState.sauce !== 'none') {
+            html += `<circle cx="100" cy="100" r="70" fill="${sauceColor}" opacity="0.9" />`;
+        }
+
+        // 3. Cheese Layer
+        if (pizzaState.cheeseAmount !== 'light' || pizzaState.cheese !== 'none') {
+            const cheeseR = 66;
+            const opacity = pizzaState.cheeseAmount === 'light' ? 0.6 : pizzaState.cheeseAmount === 'extra' ? 0.95 : 0.82;
+            html += `<circle cx="100" cy="100" r="${cheeseR}" fill="${cheeseColor}" opacity="${opacity}" />`;
+        }
+
+        // 4. Toppings Layer
+        pizzaState.toppings.forEach(t => {
+            html += `<g transform="translate(${t.x}, ${t.y}) rotate(${t.rotation})">`;
+            if (t.id === 'pepperoni') {
+                html += `<circle cx="0" cy="0" r="9" fill="${interpolateColor('#be123c', '#68071b', b)}" />`;
+                html += `<circle cx="-3" cy="-2" r="1.5" fill="#e11d48" opacity="0.6"/>`;
+            } else if (t.id === 'mushroom') {
+                html += `<path d="M-6,0 A6,6 0 0,1 6,0 L2,6 L-2,6 Z" fill="${interpolateColor('#e2e8f0', '#94a3b8', b)}" />`;
+            } else if (t.id === 'olive') {
+                html += `<circle cx="0" cy="0" r="5" fill="#1e293b" />`;
+                html += `<circle cx="0" cy="0" r="2" fill="${sauceColor}" />`;
+            } else if (t.id === 'pepper') {
+                html += `<path d="M-6,-4 Q0,6 6,-4" stroke="${interpolateColor('#16a34a', '#14532d', b)}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+            } else if (t.id === 'corn') {
+                html += `<circle cx="0" cy="0" r="3" fill="#facc15" />`;
+            } else if (t.id === 'sausage') {
+                html += `<rect x="-5" y="-3" width="10" height="6" rx="3" fill="${interpolateColor('#9f1239', '#4c0519', b)}" />`;
+            } else if (t.id === 'chicken') {
+                html += `<path d="M-4,-4 L4,-2 L2,4 L-3,2 Z" fill="${interpolateColor('#fde68a', '#d97706', b)}" />`;
+            } else if (t.id === 'onion') {
+                html += `<circle cx="0" cy="0" r="7" stroke="${interpolateColor('#a855f7', '#581c87', b)}" stroke-width="2" fill="none" />`;
+            }
+            html += `</g>`;
+        });
+
+        html += `</g>`;
+        svg.innerHTML = html;
+    }
+
+    // --- Baking Logic ---
+    function startBaking() {
+        const ovenWin = document.getElementById('oven-window');
+        const statusEl = document.getElementById('oven-status');
+        const controlsEl = document.getElementById('oven-controls');
+
+        ovenWin.classList.add('baking');
+        controlsEl.style.pointerEvents = 'none';
+        controlsEl.style.opacity = '0.5';
+
+        const duration = parseInt(document.getElementById('time-range').value) * 1000;
+        const startTime = Date.now();
+
+        const messages = ["داره طلایی میشه...", "بوی خوبی داره...", "تقریباً آماده‌ست...", "وقتشه!"];
+        let msgIndex = 0;
+
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(1, elapsed / duration);
+
+            pizzaState.bakeFactor = progress;
+            renderPizza('oven-pizza-svg');
+
+            if (progress > (msgIndex + 1) * 0.25 && msgIndex < messages.length) {
+                statusEl.innerText = messages[msgIndex];
+                msgIndex++;
+            }
+
+            if (progress >= 1) {
+                clearInterval(interval);
+                ovenWin.classList.remove('baking');
+                statusEl.innerText = "پخت کامل شد!";
+                playBellSound();
+                setTimeout(() => {
+                    controlsEl.style.pointerEvents = 'all';
+                    controlsEl.style.opacity = '1';
+                    showFinalScreen();
+                }, 1000);
+            }
+        }, 100);
+    }
+
+    function showFinalScreen() {
+        renderPizza('final-pizza-svg');
+
+        // Summary Receipt
+        const recipeEl = document.getElementById('recipe-summary');
+        const toppingNames = [...new Set(pizzaState.toppings.map(t => toppingDefinitions[t.id].name))].join('، ') || 'بدون مخلفات اضافه';
+
+        recipeEl.innerHTML = `
+            <div class="receipt-row"><span>نوع خمیر:</span> <strong>${pizzaState.dough}</strong></div>
+            <div class="receipt-row"><span>اندازه:</span> <strong>${pizzaState.size}</strong></div>
+            <div class="receipt-row"><span>سس:</span> <strong>${pizzaState.sauce}</strong></div>
+            <div class="receipt-row"><span>پنیر:</span> <strong>${pizzaState.cheese} (${pizzaState.cheeseAmount})</strong></div>
+            <div class="receipt-row"><span>مخلفات:</span> <strong>${toppingNames}</strong></div>
+        `;
+
+        showScreen('final-screen');
+    }
+
+    // --- LocalStorage & Persistence ---
+    function saveCurrentPizza() {
+        const name = document.getElementById('pizza-name-input').value || 'پیتزای من';
+        const saved = JSON.parse(localStorage.getItem('cozy_pizzas') || '[]');
+
+        saved.push({
+            id: Date.now(),
+            name,
+            date: new Date().toLocaleDateString('fa-IR'),
+            state: { ...pizzaState }
+        });
+
+        localStorage.setItem('cozy_pizzas', JSON.stringify(saved));
+        alert('پیتزا با موفقیت ذخیره شد!');
+        showScreen('home-screen');
+    }
+
+    function showSavedPizzas() {
+        const container = document.getElementById('saved-list-container');
+        const saved = JSON.parse(localStorage.getItem('cozy_pizzas') || '[]');
+
+        if (saved.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:var(--text-muted);">هنوز پیتزایی ذخیره نکرده‌اید.</div>';
+        } else {
+            container.innerHTML = saved.map(item => `
+                <div class="saved-card">
+                    <div class="saved-card-title">${item.name}</div>
+                    <div class="saved-card-date">${item.date}</div>
+                    <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem; width:100%; margin-top:8px;" onclick="reloadSavedPizza(${item.id})">دوباره بساز 🔄</button>
+                </div>
+            `).join('');
+        }
+        showScreen('saved-screen');
+    }
+
+    function reloadSavedPizza(id) {
+        const saved = JSON.parse(localStorage.getItem('cozy_pizzas') || '[]');
+        const target = saved.find(p => p.id === id);
+        if (target) {
+            pizzaState = { ...target.state };
+            currentStep = 1;
+            updateStepUI();
+            showScreen('builder-screen');
+        }
+    }
+
+    function makeRandomPizza() {
+        const keys = Object.keys(toppingDefinitions);
+        const randomToppings = [];
+        for (let i = 0; i < 8; i++) {
+            const randKey = keys[Math.floor(Math.random() * keys.length)];
+            randomToppings.push({
+                id: randKey,
+                x: 60 + Math.random() * 80,
+                y: 60 + Math.random() * 80,
+                rotation: Math.floor(Math.random() * 360)
+            });
+        }
+
+        pizzaState = {
+            dough: ['classic', 'thin', 'thick'][Math.floor(Math.random() * 3)],
+            shape: 'round',
+            size: ['small', 'medium', 'large'][Math.floor(Math.random() * 3)],
+            sauce: ['tomato', 'white', 'spicy'][Math.floor(Math.random() * 3)],
+            cheese: ['mozzarella', 'cheddar', 'mix'][Math.floor(Math.random() * 3)],
+            cheeseAmount: ['light', 'normal', 'extra'][Math.floor(Math.random() * 3)],
+            toppings: randomToppings,
+            selectedToppingCategory: 'pepperoni',
+            bakeFactor: 0
+        };
+
+        currentStep = 1;
+        updateStepUI();
+        showScreen('builder-screen');
+    }
+
+    // --- Audio Synthetic Generator ---
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function toggleAudio() {
+        initAudio();
+        isPlayingAudio = !isPlayingAudio;
+        document.getElementById('audio-toggle-btn').style.borderColor = isPlayingAudio ? 'var(--primary)' : 'var(--border-color)';
+        if (isPlayingAudio) playAmbientChords();
+    }
+
+    function playPopSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        } catch (e) {}
+    }
+
+    function playBellSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.2);
+        } catch (e) {}
+    }
+
+    function playAmbientChords() {
+        if (!isPlayingAudio) return;
+        try {
+            const freqs = [261.63, 329.63, 392.00, 523.25]; // C major lofi chord
+            freqs.forEach(f => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = f;
+                gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 2);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 4);
+            });
+            setTimeout(() => { if (isPlayingAudio) playAmbientChords(); }, 4000);
+        } catch(e) {}
+    }
+
+    // --- Helpers ---
+    function toggleTheme() {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    }
+
+    function interpolateColor(color1, color2, factor) {
+        const c1 = parseInt(color1.slice(1), 16);
+        const c2 = parseInt(color2.slice(1), 16);
+
+        const r1 = (c1 >> 16) & 255, g1 = (c1 >> 8) & 255, b1 = c1 & 255;
+        const r2 = (c2 >> 16) & 255, g2 = (c2 >> 8) & 255, b2 = c2 & 255;
+
+        const r = Math.round(r1 + factor * (r2 - r1));
+        const g = Math.round(g1 + factor * (g2 - g1));
+        const b = Math.round(b1 + factor * (b2 - b1));
+
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+</script>
+</body>
+</html>
